@@ -18,18 +18,37 @@
 
         .command-input {
             display: flex;
+            flex-direction: column;
             gap: 1rem;
             margin-bottom: 2rem;
         }
 
-        .command-input input {
-            flex: 1;
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .command-input input,
+        .command-input textarea {
             padding: 12px;
             border: none;
             border-radius: 5px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
             font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .command-input textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
         .command-input button {
@@ -40,6 +59,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: transform 0.3s ease;
+            align-self: flex-start;
         }
 
         .command-input button:hover {
@@ -82,18 +102,25 @@
         <h1>Silent Signal Commands</h1>
         
         <div class="command-input">
-            <input type="text" id="commandInput" placeholder="Type your command (e.g., .dm @user Hello)">
-            <button onclick="sendCommand()">Send</button>
+            <div class="input-group">
+                <label for="usernameInput">Username or ID:</label>
+                <input type="text" id="usernameInput" placeholder="Enter username or ID (e.g., @user or 123456789)">
+            </div>
+            
+            <div class="input-group">
+                <label for="messageInput">Message:</label>
+                <textarea id="messageInput" placeholder="Enter your message"></textarea>
+            </div>
+            
+            <button onclick="sendCommand()">Send Message</button>
         </div>
 
         <div class="command-list">
             <div class="command-item">
-                <h3>.dm @user [message]</h3>
-                <p>Send a direct message to a user</p>
-            </div>
-            <div class="command-item">
-                <h3>.help</h3>
-                <p>Show all available commands</p>
+                <h3>How to use:</h3>
+                <p>1. Enter the username or ID of the user you want to message</p>
+                <p>2. Type your message in the message box</p>
+                <p>3. Click "Send Message" to send the DM</p>
             </div>
         </div>
 
@@ -104,11 +131,17 @@
 
     <script>
         function sendCommand() {
-            const commandInput = document.getElementById('commandInput');
+            const usernameInput = document.getElementById('usernameInput');
+            const messageInput = document.getElementById('messageInput');
             const responseArea = document.getElementById('responseArea');
-            const command = commandInput.value.trim();
+            
+            const username = usernameInput.value.trim();
+            const message = messageInput.value.trim();
 
-            if (!command) return;
+            if (!username || !message) {
+                responseArea.textContent = 'Please fill in both username and message fields.';
+                return;
+            }
 
             // Send command to server
             fetch('/api/command', {
@@ -116,21 +149,24 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ command }),
+                body: JSON.stringify({ 
+                    command: `.dm ${username} ${message}` 
+                }),
             })
             .then(response => response.json())
             .then(data => {
-                responseArea.textContent = data.response || 'Command sent successfully!';
-                commandInput.value = '';
+                responseArea.textContent = data.response || 'Message sent successfully!';
+                messageInput.value = ''; // Clear message after sending
             })
             .catch(error => {
                 responseArea.textContent = 'Error: ' + error.message;
             });
         }
 
-        // Allow pressing Enter to send command
-        document.getElementById('commandInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+        // Allow pressing Enter in message input to send
+        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendCommand();
             }
         });
