@@ -143,6 +143,9 @@
                 return;
             }
 
+            // Show loading state
+            responseArea.textContent = 'Sending message...';
+            
             // Send command to server
             fetch('/api/command', {
                 method: 'POST',
@@ -153,7 +156,14 @@
                     command: `.dm ${username} ${message}` 
                 }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to send message');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 responseArea.textContent = data.response || 'Message sent successfully!';
                 messageInput.value = ''; // Clear message after sending

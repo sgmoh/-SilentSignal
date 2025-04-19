@@ -14,6 +14,14 @@ const client = new Client({
     partials: [Partials.Channel]
 });
 
+let botReady = false;
+
+// Bot ready event
+client.once('ready', () => {
+    console.log('Bot is ready!');
+    botReady = true;
+});
+
 // Create HTTP server
 const server = http.createServer((req, res) => {
     // Handle OAuth2 callback
@@ -35,6 +43,12 @@ const server = http.createServer((req, res) => {
 
     // Handle command API
     if (req.url === '/api/command' && req.method === 'POST') {
+        if (!botReady) {
+            res.writeHead(503);
+            res.end(JSON.stringify({ error: 'Bot is not ready yet. Please try again in a few seconds.' }));
+            return;
+        }
+
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
@@ -122,8 +136,9 @@ async function handleCommand(command, res) {
                     res.writeHead(200);
                     res.end(JSON.stringify({ response: `Message sent to ${user.tag}` }));
                 } catch (error) {
+                    console.error('Error sending message:', error);
                     res.writeHead(400);
-                    res.end(JSON.stringify({ error: 'Failed to send message' }));
+                    res.end(JSON.stringify({ error: `Failed to send message: ${error.message}` }));
                 }
                 break;
                 
@@ -139,6 +154,7 @@ async function handleCommand(command, res) {
                 res.end(JSON.stringify({ error: 'Unknown command' }));
         }
     } catch (error) {
+        console.error('Command handler error:', error);
         res.writeHead(500);
         res.end(JSON.stringify({ error: 'Internal server error' }));
     }
@@ -151,6 +167,9 @@ server.listen(PORT, () => {
 });
 
 // Discord bot login
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN).catch(error => {
+    console.error('Failed to login:', error);
+    process.exit(1);
+});
 
 // ... rest of your bot code ... 
