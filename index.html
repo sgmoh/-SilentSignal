@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SilentSignal</title>
+    <link rel="icon" type="image/png" href="Silentsignal.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="grid-background"></div>
+    
+    <div class="container">
+        <header>
+            <img src="Silentsignal.png" alt="SilentSignal Logo" class="logo">
+            <h1 class="glow">SilentSignal</h1>
+            <p class="subtitle">Your Ultimate Discord Companion</p>
+            <a href="#" class="use-now-btn" id="use-now-btn">
+                <span>Use Now</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </header>
+
+        <div class="floating-buttons">
+            <a href="#" class="floating-button" id="invite-btn">
+                <i class="fas fa-robot"></i>
+                <span>Invite Bot</span>
+            </a>
+            <a href="#" class="floating-button" id="support-btn">
+                <i class="fas fa-headset"></i>
+                <span>Support</span>
+            </a>
+            <a href="#" class="floating-button" id="commands-btn">
+                <i class="fas fa-terminal"></i>
+                <span>Commands</span>
+            </a>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-comments"></i>
+                <h3>Direct Messaging</h3>
+                <p>Efficient communication at your fingertips</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure</h3>
+                <p>Protected and reliable service</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Fast</h3>
+                <p>Lightning quick responses</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commands Modal -->
+    <div class="modal" id="commandsModal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Available Commands</h2>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-header">
+                        <i class="fas fa-comment-dots"></i>
+                        <h3>!dm</h3>
+                    </div>
+                    <div class="command-details">
+                        <p class="command-description">Send a direct message to a user</p>
+                        <p class="command-usage">Usage: !dm @user [message]</p>
+                        <p class="command-permission">Permission: Admin Only</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
