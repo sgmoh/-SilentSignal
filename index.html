@@ -8,29 +8,39 @@
     <link rel="icon" type="image/png" href="Silentsignal.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .nav-links {
+        .floating-buttons {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
             display: flex;
+            flex-direction: column;
             gap: 1rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
+            z-index: 1000;
         }
 
-        .nav-links .btn {
+        .floating-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             background: rgba(76, 175, 80, 0.2);
             color: white;
             padding: 12px 24px;
-            border-radius: 5px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
             transition: all 0.3s ease;
             border: 1px solid rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .nav-links .btn:hover {
+        .floating-button:hover {
             background: rgba(76, 175, 80, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .floating-button i {
+            font-size: 1.2rem;
         }
 
         .owner-btn {
@@ -49,28 +59,24 @@
             <img src="Silentsignal.png" alt="SilentSignal Logo" class="logo">
             <h1 class="glow">SilentSignal</h1>
             <p class="subtitle">Your Ultimate Discord Companion</p>
-            <nav>
-                <div class="nav-links">
-                    <a href="https://discord.com/oauth2/authorize?client_id=1245761421994033202&permissions=8&scope=bot" class="btn">Use Now</a>
-                    <a href="https://discord.gg/your-support-server" class="btn">Support</a>
-                    <a href="commands.html" class="btn">Commands</a>
-                    <a href="/api/auth/login?redirect=/owner.html" class="btn owner-btn">Owner Panel</a>
-                </div>
-            </nav>
         </header>
 
         <div class="floating-buttons">
-            <a href="#" class="floating-button" id="invite-btn">
+            <a href="https://discord.com/oauth2/authorize?client_id=1363114298406076627&permissions=8&scope=bot" class="floating-button" id="invite-btn">
                 <i class="fas fa-robot"></i>
                 <span>Invite Bot</span>
             </a>
-            <a href="#" class="floating-button" id="support-btn">
+            <a href="https://discord.gg/your-support-server" class="floating-button" id="support-btn">
                 <i class="fas fa-headset"></i>
                 <span>Support</span>
             </a>
-            <a href="#" class="floating-button" id="commands-btn">
+            <a href="commands.html" class="floating-button" id="commands-btn">
                 <i class="fas fa-terminal"></i>
                 <span>Commands</span>
+            </a>
+            <a href="/api/auth/login?redirect=/owner.html" class="floating-button owner-btn" id="owner-btn">
+                <i class="fas fa-crown"></i>
+                <span>Owner Panel</span>
             </a>
         </div>
 
