@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silent Signal - Owner Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            margin: 2rem auto;
+            max-width: 400px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            font-size: 1rem;
+        }
+
+        .login-btn {
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .error-message {
+            color: #f44336;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .back-link {
+            color: #4CAF50;
+            text-align: center;
+            margin-top: 1rem;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Owner Login</h1>
+        <div class="login-form">
+            <div class="input-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="input-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <button class="login-btn" onclick="login()">Login</button>
+            <div id="errorMessage" class="error-message"></div>
+            <a href="/index.html" class="back-link">Back to Discord Login</a>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (!username || !password) {
+                errorMessage.textContent = 'Please enter both username and password';
+                return;
+            }
+
+            fetch('/api/owner/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Login failed');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Set session cookie
+                document.cookie = `session=${data.token}; Path=/; HttpOnly; SameSite=Strict`;
+                // Redirect to owner panel
+                window.location.href = '/owner.html';
+            })
+            .catch(error => {
+                errorMessage.textContent = error.message;
+            });
+        }
+
+        // Allow pressing Enter to submit
+        document.getElementById('password').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html> 

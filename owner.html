@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silent Signal - Owner Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #0a0a0a;
+            background-image: 
+                linear-gradient(rgba(76, 175, 80, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(76, 175, 80, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: center center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+
+        .owner-container {
+            background: rgba(15, 15, 15, 0.8);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            margin: 2rem auto;
+            max-width: 1200px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0;
+            color: #4CAF50;
+            font-size: 2rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .section {
+            background: rgba(20, 20, 20, 0.6);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            gap: 3rem;
+            position: relative;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: #4CAF50;
+            margin-top: 0;
+            font-size: 1.5rem;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            padding-bottom: 0.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            padding: 12px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .input-group textarea {
+            min-height: 200px;
+            resize: vertical;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            padding: 15px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .input-group textarea:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .danger {
+            background: #f44336;
+        }
+
+        .danger:hover {
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .response-area {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            min-height: 100px;
+            white-space: pre-wrap;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        .dm-history {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .dm-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .dm-item:hover {
+            transform: translateX(5px);
+        }
+
+        .dm-item h3 {
+            color: #4CAF50;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .dm-item p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .server-select {
+            margin-bottom: 1rem;
+        }
+
+        .server-select select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .member-list {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .member-item:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+            transform: translateX(5px);
+        }
+
+        .member-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .member-item input[type="checkbox"] {
+            margin-right: 15px;
+            width: 18px;
+            height: 18px;
+            accent-color: #4CAF50;
+            cursor: pointer;
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .member-name {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .selected-count {
+            color: #4CAF50;
+            margin: 1rem 0;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.8rem;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 1.1rem;
+        }
+
+        .send-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Enhanced scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(76, 175, 80, 0.5);
+            border-radius: 5px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 175, 80, 0.7);
+        }
+
+        .message-section {
+            flex: 1;
+            min-width: 400px;
+            padding: 1.5rem;
+            background: rgba(15, 15, 15, 0.4);
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .members-section {
+            flex: 1;
+            min-width: 400px;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(15, 15, 15, 0.4);
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="owner-container">
+        <div class="header">
+            <h1>
+                <img src="Silentsignal.png" alt="Silent Signal Logo" class="logo">
+                Silent Signal Owner Panel
+            </h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="section">
+            <h2>Bulk DM</h2>
+            <div class="message-section">
+                <div class="input-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" rows="8" placeholder="Enter your message"></textarea>
+                </div>
+                <button class="send-btn" onclick="sendBulkDM()">Send DM</button>
+                <div class="response-area" id="bulkResponse"></div>
+            </div>
+            <div class="members-section">
+                <input type="text" id="memberSearch" class="search-box" placeholder="Search members..." oninput="filterMembers()">
+                <div class="selected-count" id="selectedCount">0 members selected</div>
+                <div class="member-list" id="memberList">
+                    <!-- Members will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>DM History</h2>
+            <button onclick="loadDMHistory()">Load DM History</button>
+            <div class="dm-history" id="dmHistory"></div>
+        </div>
+
+        <div class="section">
+            <h2>Bot Statistics</h2>
+            <button onclick="loadStats()">Load Statistics</button>
+            <div class="response-area" id="statsResponse"></div>
+        </div>
+
+        <div class="section">
+            <h2>Bot Replies</h2>
+            <button onclick="loadBotReplies()">Load Replies</button>
+            <div class="replies-history" id="repliesHistory"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedMembers = new Set();
+        let allMembers = [];
+
+        async function loadAllMembers() {
+            try {
+                const response = await fetch('/api/owner/servers');
+                const data = await response.json();
+                
+                allMembers = [];
+                for (const server of data.servers) {
+                    const membersResponse = await fetch(`/api/owner/servers/${server.id}/members`);
+                    const membersData = await membersResponse.json();
+                    allMembers = allMembers.concat(membersData.members);
+                }
+                
+                // Remove duplicates based on user ID
+                allMembers = allMembers.filter((member, index, self) =>
+                    index === self.findIndex((m) => m.id === member.id)
+                );
+                
+                renderMembers();
+            } catch (error) {
+                console.error('Error loading members:', error);
+            }
+        }
+
+        function renderMembers() {
+            const memberList = document.getElementById('memberList');
+            memberList.innerHTML = '';
+
+            allMembers.forEach(member => {
+                const memberItem = document.createElement('div');
+                memberItem.className = 'member-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = selectedMembers.has(member.id);
+                checkbox.onchange = () => toggleMember(member.id);
+
+                const memberInfo = document.createElement('div');
+                memberInfo.className = 'member-info';
+                
+                const avatar = document.createElement('img');
+                avatar.className = 'member-avatar';
+                avatar.src = member.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                avatar.alt = member.username;
+
+                const name = document.createElement('span');
+                name.className = 'member-name';
+                name.textContent = `${member.username}#${member.discriminator}`;
+
+                memberInfo.appendChild(avatar);
+                memberInfo.appendChild(name);
+                
+                memberItem.appendChild(checkbox);
+                memberItem.appendChild(memberInfo);
+                memberList.appendChild(memberItem);
+            });
+
+            updateSelectedCount();
+        }
+
+        function toggleMember(memberId) {
+            if (selectedMembers.has(memberId)) {
+                selectedMembers.delete(memberId);
+            } else {
+                selectedMembers.add(memberId);
+            }
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const countElement = document.getElementById('selectedCount');
+            countElement.textContent = `${selectedMembers.size} members selected`;
+        }
+
+        function filterMembers() {
+            const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
+            const filteredMembers = allMembers.filter(member => 
+                member.username.toLowerCase().includes(searchTerm) ||
+                member.discriminator.includes(searchTerm)
+            );
+            
+            const memberList = document.getElementById('memberList');
+            memberList.innerHTML = '';
+
+            filteredMembers.forEach(member => {
+                const memberItem = document.createElement('div');
+                memberItem.className = 'member-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = selectedMembers.has(member.id);
+                checkbox.onchange = () => toggleMember(member.id);
+
+                const memberInfo = document.createElement('div');
+                memberInfo.className = 'member-info';
+                
+                const avatar = document.createElement('img');
+                avatar.className = 'member-avatar';
+                avatar.src = member.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                avatar.alt = member.username;
+
+                const name = document.createElement('span');
+                name.className = 'member-name';
+                name.textContent = `${member.username}#${member.discriminator}`;
+
+                memberInfo.appendChild(avatar);
+                memberInfo.appendChild(name);
+                
+                memberItem.appendChild(checkbox);
+                memberItem.appendChild(memberInfo);
+                memberList.appendChild(memberItem);
+            });
+        }
+
+        async function sendBulkDM() {
+            const message = document.getElementById('message').value.trim();
+            if (!message) {
+                document.getElementById('bulkResponse').textContent = 'Please enter a message';
+                return;
+            }
+
+            if (selectedMembers.size === 0) {
+                document.getElementById('bulkResponse').textContent = 'Please select at least one member';
+                return;
+            }
+
+            const status = document.getElementById('bulkResponse');
+            status.textContent = 'Sending messages...';
+
+            try {
+                const response = await fetch('/api/owner/bulk-dm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userIds: Array.from(selectedMembers),
+                        message: message
+                    }),
+                });
+
+                const data = await response.json();
+                status.textContent = data.response;
+                
+                // Clear selection and message
+                selectedMembers.clear();
+                document.getElementById('message').value = '';
+                updateSelectedCount();
+                renderMembers();
+                
+                // Refresh stats and history
+                loadStats();
+                loadHistory();
+            } catch (error) {
+                status.textContent = 'Error sending messages: ' + error.message;
+            }
+        }
+
+        function loadDMHistory() {
+            const historyArea = document.getElementById('dmHistory');
+            historyArea.innerHTML = 'Loading DM history...';
+            
+            fetch('/api/owner/dm-history', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load DM history');
+                }
+                return response.json();
+            })
+            .then(data => {
+                historyArea.innerHTML = '';
+                data.history.forEach(dm => {
+                    const dmItem = document.createElement('div');
+                    dmItem.className = 'dm-item';
+                    dmItem.innerHTML = `
+                        <h3>${dm.username} (${dm.userId})</h3>
+                        <p>Message: ${dm.message}</p>
+                        <p>Sent at: ${new Date(dm.timestamp).toLocaleString()}</p>
+                    `;
+                    historyArea.appendChild(dmItem);
+                });
+            })
+            .catch(error => {
+                historyArea.innerHTML = 'Error: ' + error.message;
+                if (error.message.includes('Not authenticated')) {
+                    window.location.href = '/index.html';
+                }
+            });
+        }
+
+        function loadStats() {
+            const statsArea = document.getElementById('statsResponse');
+            statsArea.textContent = 'Loading statistics...';
+            
+            fetch('/api/owner/stats', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load statistics');
+                }
+                return response.json();
+            })
+            .then(data => {
+                statsArea.textContent = `
+                    Total DMs Sent: ${data.totalDMs}
+                    Active Users: ${data.activeUsers}
+                    Last 24 Hours: ${data.dmsLast24Hours}
+                    Server Count: ${data.serverCount}
+                `;
+            })
+            .catch(error => {
+                statsArea.textContent = 'Error: ' + error.message;
+                if (error.message.includes('Not authenticated')) {
+                    window.location.href = '/index.html';
+                }
+            });
+        }
+
+        function loadBotReplies() {
+            const repliesArea = document.getElementById('repliesHistory');
+            repliesArea.innerHTML = 'Loading bot replies...';
+            
+            fetch('/api/owner/bot-replies', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load bot replies');
+                }
+                return response.json();
+            })
+            .then(data => {
+                repliesArea.innerHTML = '';
+                data.replies.forEach(reply => {
+                    const replyItem = document.createElement('div');
+                    replyItem.className = 'reply-item';
+                    replyItem.innerHTML = `
+                        <h3>${reply.username} (${reply.user_id})</h3>
+                        <p>Received at: ${new Date(reply.timestamp).toLocaleString()}</p>
+                        <div class="reply-message">${reply.message}</div>
+                    `;
+                    repliesArea.appendChild(replyItem);
+                });
+            })
+            .catch(error => {
+                repliesArea.innerHTML = 'Error: ' + error.message;
+                if (error.message.includes('Not authenticated')) {
+                    window.location.href = '/index.html';
+                }
+            });
+        }
+
+        function logout() {
+            document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/index.html';
+        }
+
+        // Load initial data
+        loadAllMembers();
+        loadStats();
+        loadHistory();
+        loadBotReplies();
+    </script>
+</body>
+</html> 
