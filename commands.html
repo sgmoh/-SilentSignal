@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silent Signal - Commands</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .command-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+
+        .command-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .command-input input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .command-input button {
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .command-input button:hover {
+            transform: translateY(-3px);
+        }
+
+        .command-list {
+            margin-top: 2rem;
+        }
+
+        .command-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .command-item h3 {
+            color: #4CAF50;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .command-item p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .response-area {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="command-container">
+        <h1>Silent Signal Commands</h1>
+        
+        <div class="command-input">
+            <input type="text" id="commandInput" placeholder="Type your command (e.g., .dm @user Hello)">
+            <button onclick="sendCommand()">Send</button>
+        </div>
+
+        <div class="command-list">
+            <div class="command-item">
+                <h3>.dm @user [message]</h3>
+                <p>Send a direct message to a user</p>
+            </div>
+            <div class="command-item">
+                <h3>.help</h3>
+                <p>Show all available commands</p>
+            </div>
+        </div>
+
+        <div class="response-area" id="responseArea">
+            <!-- Command responses will appear here -->
+        </div>
+    </div>
+
+    <script>
+        function sendCommand() {
+            const commandInput = document.getElementById('commandInput');
+            const responseArea = document.getElementById('responseArea');
+            const command = commandInput.value.trim();
+
+            if (!command) return;
+
+            // Send command to server
+            fetch('/api/command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ command }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseArea.textContent = data.response || 'Command sent successfully!';
+                commandInput.value = '';
+            })
+            .catch(error => {
+                responseArea.textContent = 'Error: ' + error.message;
+            });
+        }
+
+        // Allow pressing Enter to send command
+        document.getElementById('commandInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendCommand();
+            }
+        });
+    </script>
+</body>
+</html> 

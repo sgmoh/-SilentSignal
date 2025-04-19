@@ -23,13 +23,31 @@ const server = http.createServer((req, res) => {
         
         if (code) {
             res.writeHead(302, {
-                'Location': '/success.html'
+                'Location': '/commands.html'
             });
             res.end();
         } else {
             res.writeHead(400);
             res.end('Invalid request');
         }
+        return;
+    }
+
+    // Handle command API
+    if (req.url === '/api/command' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            try {
+                const { command } = JSON.parse(body);
+                handleCommand(command, res);
+            } catch (error) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Invalid request' }));
+            }
+        });
         return;
     }
 
@@ -80,6 +98,51 @@ const server = http.createServer((req, res) => {
         }
     });
 });
+
+// Command handler
+async function handleCommand(command, res) {
+    try {
+        // Parse the command
+        const [cmd, ...args] = command.split(' ');
+        
+        switch (cmd.toLowerCase()) {
+            case '.dm':
+                if (args.length < 2) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ error: 'Invalid command format. Use: .dm @user message' }));
+                    return;
+                }
+                
+                const userId = args[0].replace(/[<@!>]/g, '');
+                const message = args.slice(1).join(' ');
+                
+                try {
+                    const user = await client.users.fetch(userId);
+                    await user.send(message);
+                    res.writeHead(200);
+                    res.end(JSON.stringify({ response: `Message sent to ${user.tag}` }));
+                } catch (error) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ error: 'Failed to send message' }));
+                }
+                break;
+                
+            case '.help':
+                res.writeHead(200);
+                res.end(JSON.stringify({ 
+                    response: 'Available commands:\n.dm @user message - Send a DM to a user\n.help - Show this help message' 
+                }));
+                break;
+                
+            default:
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Unknown command' }));
+        }
+    } catch (error) {
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Internal server error' }));
+    }
+}
 
 // Start server
 const PORT = process.env.PORT || 3000;
