@@ -3,14 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SilentSignal</title>
-    <link rel="icon" type="image/png" href="Silentsignal.png">
+    <title>SilentSignal - Discord Bot</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="Silentsignal.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-links .btn {
+            background: rgba(76, 175, 80, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .nav-links .btn:hover {
+            background: rgba(76, 175, 80, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .owner-btn {
+            background: #4CAF50;
+        }
+
+        .owner-btn:hover {
+            background: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <div class="grid-background"></div>
-    
+    <div class="grid-bg"></div>
     <div class="container">
         <header>
             <img src="Silentsignal.png" alt="SilentSignal Logo" class="logo">
@@ -41,7 +74,7 @@
             </a>
         </div>
 
-        <div class="features">
+        <section class="features">
             <div class="feature-card">
                 <i class="fas fa-comments"></i>
                 <h3>Direct Messaging</h3>
@@ -57,7 +90,7 @@
                 <h3>Fast</h3>
                 <p>Lightning quick responses</p>
             </div>
-        </div>
+        </section>
     </div>
 
     <!-- Commands Modal -->
@@ -83,22 +116,4 @@
 
     <script src="script.js"></script>
 </body>
-</html>
-
-<style>
-    .owner-btn {
-        background: #4CAF50;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-    .owner-btn:hover {
-        background: #45a049;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-    }
-</style> 
+</html> 
