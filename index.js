@@ -51,7 +51,7 @@ client.on('messageCreate', async message => {
 const server = http.createServer(async (req, res) => {
     // Handle OAuth2 callback
     if (req.url.startsWith('/api/auth/callback')) {
-        const url = new URL(req.url, 'http://localhost:10000');
+        const url = new URL(req.url, `http://${req.headers.host}`);
         const code = url.searchParams.get('code');
         
         if (!code) {
@@ -72,7 +72,7 @@ const server = http.createServer(async (req, res) => {
                     client_secret: process.env.CLIENT_SECRET,
                     grant_type: 'authorization_code',
                     code: code,
-                    redirect_uri: process.env.REDIRECT_URI
+                    redirect_uri: `${process.env.REDIRECT_URI}/api/auth/callback`
                 })
             });
 
@@ -129,6 +129,19 @@ const server = http.createServer(async (req, res) => {
             res.end('Authentication failed');
         }
         return;
+    }
+
+    // Add a redirect handler for the old auth URL
+    if (req.url.startsWith('/auth')) {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const code = url.searchParams.get('code');
+        if (code) {
+            res.writeHead(302, {
+                Location: `/api/auth/callback?code=${code}`
+            });
+            res.end();
+            return;
+        }
     }
 
     // Handle owner API routes

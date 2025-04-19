@@ -16,10 +16,14 @@
             <img src="Silentsignal.png" alt="SilentSignal Logo" class="logo">
             <h1 class="glow">SilentSignal</h1>
             <p class="subtitle">Your Ultimate Discord Companion</p>
-            <a href="#" class="use-now-btn" id="use-now-btn">
-                <span>Use Now</span>
-                <i class="fas fa-arrow-right"></i>
-            </a>
+            <nav>
+                <div class="nav-links">
+                    <a href="https://discord.com/api/oauth2/authorize?client_id=1245761421994033202&permissions=8&scope=bot" class="btn">Use Now</a>
+                    <a href="https://discord.gg/your-support-server" class="btn">Support</a>
+                    <a href="commands.html" class="btn">Commands</a>
+                    <a href="/api/auth/login?redirect=/owner.html" class="btn owner-btn">Owner Panel</a>
+                </div>
+            </nav>
         </header>
 
         <div class="floating-buttons">
@@ -79,4 +83,22 @@
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>
+
+<style>
+    .owner-btn {
+        background: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .owner-btn:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    }
+</style> 
