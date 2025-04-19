@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const permissions = '8'; // Administrator permissions
     const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=${permissions}&scope=bot`;
     
-    // Generate OAuth2 authorization link
-    const oauthLink = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=https%3A%2F%2Fdiscord.gg%2Fswoosh&response_type=code&scope=identify%20guilds%20bot&permissions=${permissions}`;
+    // Generate OAuth2 authorization link with Render URL
+    const oauthLink = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=https%3A%2F%2Fsilentsignal.onrender.com%2Fauth&response_type=code&scope=identify%20guilds%20bot&permissions=${permissions}`;
 
     // Set invite button href
     inviteBtn.addEventListener('click', (e) => {

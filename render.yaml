@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: silent-signal-bot
+    name: silent-signal
     env: node
     buildCommand: npm install
     startCommand: node index.js
@@ -12,4 +12,5 @@ services:
       - key: GUILD_ID
         sync: false
     healthCheckPath: /health
-    autoDeploy: true 
+    autoDeploy: true
+    staticPublishPath: ./ 
