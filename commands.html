@@ -100,11 +100,35 @@
             min-height: 100px;
             white-space: pre-wrap;
         }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
     <div class="command-container">
-        <h1>Silent Signal Commands</h1>
+        <div class="header">
+            <h1>Silent Signal Commands</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
         
         <div class="command-input">
             <div class="input-group">
@@ -135,6 +159,25 @@
     </div>
 
     <script>
+        // Check if user is authenticated
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ command: '.help' }),
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = '/index.html';
+                }
+            })
+            .catch(() => {
+                window.location.href = '/index.html';
+            });
+        });
+
         function sendCommand() {
             const usernameInput = document.getElementById('usernameInput');
             const messageInput = document.getElementById('messageInput');
@@ -175,7 +218,16 @@
             })
             .catch(error => {
                 responseArea.textContent = 'Error: ' + error.message;
+                if (error.message.includes('Not authenticated')) {
+                    window.location.href = '/index.html';
+                }
             });
+        }
+
+        function logout() {
+            // Clear session cookie
+            document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/index.html';
         }
 
         // Allow pressing Enter in message input to send
