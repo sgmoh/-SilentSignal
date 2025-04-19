@@ -17,15 +17,18 @@ async function initializeDatabase() {
             )
         `);
 
-        // Create users table
+        // Create users table with is_owner column
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
-                id TEXT PRIMARY KEY,
-                username TEXT NOT NULL,
-                access_token TEXT NOT NULL,
-                refresh_token TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                is_owner BOOLEAN DEFAULT FALSE
+                id VARCHAR(255) PRIMARY KEY,
+                username VARCHAR(255) NOT NULL,
+                discriminator VARCHAR(255) NOT NULL,
+                avatar VARCHAR(255),
+                access_token VARCHAR(255) NOT NULL,
+                refresh_token VARCHAR(255) NOT NULL,
+                expires_at TIMESTAMP NOT NULL,
+                is_owner BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
@@ -39,27 +42,25 @@ async function initializeDatabase() {
             )
         `);
 
-        // Create DM history table
+        // Create dm_history table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS dm_history (
                 id SERIAL PRIMARY KEY,
-                sender_id TEXT NOT NULL,
-                receiver_id TEXT NOT NULL,
-                receiver_username TEXT NOT NULL,
+                user_id VARCHAR(255) NOT NULL,
+                target_id VARCHAR(255) NOT NULL,
                 message TEXT NOT NULL,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (sender_id) REFERENCES users(id)
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
             )
         `);
 
-        // Create bot replies table
+        // Create bot_replies table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS bot_replies (
                 id SERIAL PRIMARY KEY,
-                user_id TEXT NOT NULL,
-                username TEXT NOT NULL,
-                message TEXT NOT NULL,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                trigger TEXT NOT NULL,
+                response TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
@@ -77,6 +78,7 @@ async function initializeDatabase() {
         console.log('Database initialized successfully');
     } catch (error) {
         console.error('Error initializing database:', error);
+        throw error;
     }
 }
 
@@ -108,11 +110,30 @@ async function cleanupExpiredSessions() {
 }
 
 // User management functions
-async function createUser(id, username, accessToken, refreshToken, isOwner = false) {
-    await pool.query(
-        'INSERT INTO users (id, username, access_token, refresh_token, is_owner) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET access_token = $3, refresh_token = $4, is_owner = $5',
-        [id, username, accessToken, refreshToken, isOwner]
-    );
+async function createUser(userData) {
+    try {
+        const { id, username, discriminator, avatar, access_token, refresh_token, expires_at, is_owner } = userData;
+        
+        const result = await pool.query(
+            `INSERT INTO users (id, username, discriminator, avatar, access_token, refresh_token, expires_at, is_owner)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+             ON CONFLICT (id) DO UPDATE SET
+                 username = $2,
+                 discriminator = $3,
+                 avatar = $4,
+                 access_token = $5,
+                 refresh_token = $6,
+                 expires_at = $7,
+                 is_owner = $8
+             RETURNING *`,
+            [id, username, discriminator, avatar, access_token, refresh_token, expires_at, is_owner]
+        );
+        
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error creating/updating user:', error);
+        throw error;
+    }
 }
 
 async function getUser(id) {

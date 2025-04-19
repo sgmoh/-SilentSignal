@@ -50,62 +50,83 @@ client.on('messageCreate', async message => {
 // Create HTTP server
 const server = http.createServer(async (req, res) => {
     // Handle OAuth2 callback
-    if (req.url.startsWith('/auth')) {
-        const url = new URL(req.url, `http://${req.headers.host}`);
+    if (req.url.startsWith('/api/auth/callback')) {
+        const url = new URL(req.url, 'http://localhost:10000');
         const code = url.searchParams.get('code');
         
-        if (code) {
-            try {
-                // Exchange code for tokens
-                const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        client_id: process.env.CLIENT_ID,
-                        client_secret: process.env.CLIENT_SECRET,
-                        code,
-                        grant_type: 'authorization_code',
-                        redirect_uri: process.env.REDIRECT_URI,
-                        scope: 'identify'
-                    }),
-                });
-
-                const tokens = await tokenResponse.json();
-                
-                // Get user info
-                const userResponse = await fetch('https://discord.com/api/users/@me', {
-                    headers: {
-                        Authorization: `Bearer ${tokens.access_token}`,
-                    },
-                });
-                
-                const user = await userResponse.json();
-                
-                // Check if user is owner
-                const isOwner = user.id === process.env.OWNER_ID;
-                
-                // Store user and create session
-                await createUser(user.id, user.username, tokens.access_token, tokens.refresh_token, isOwner);
-                
-                const sessionToken = crypto.randomBytes(32).toString('hex');
-                await createSession(sessionToken, user.id);
-
-                // Set cookie and redirect
-                res.writeHead(302, {
-                    'Location': isOwner ? '/owner.html' : '/commands.html',
-                    'Set-Cookie': `session=${sessionToken}; Path=/; HttpOnly; SameSite=Strict`
-                });
-                res.end();
-            } catch (error) {
-                console.error('Auth error:', error);
-                res.writeHead(500);
-                res.end('Authentication failed');
-            }
-        } else {
+        if (!code) {
             res.writeHead(400);
-            res.end('Invalid request');
+            res.end('Missing authorization code');
+            return;
+        }
+
+        try {
+            // Exchange code for access token
+            const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: process.env.CLIENT_ID,
+                    client_secret: process.env.CLIENT_SECRET,
+                    grant_type: 'authorization_code',
+                    code: code,
+                    redirect_uri: process.env.REDIRECT_URI
+                })
+            });
+
+            const tokenData = await tokenResponse.json();
+            
+            // Get user info
+            const userResponse = await fetch('https://discord.com/api/users/@me', {
+                headers: {
+                    Authorization: `Bearer ${tokenData.access_token}`
+                }
+            });
+            
+            const userData = await userResponse.json();
+            
+            // Check if user is owner
+            const isOwner = userData.id === process.env.OWNER_ID;
+            
+            // Create or update user in database
+            await createUser({
+                id: userData.id,
+                username: userData.username,
+                discriminator: userData.discriminator,
+                avatar: userData.avatar,
+                access_token: tokenData.access_token,
+                refresh_token: tokenData.refresh_token,
+                expires_at: new Date(Date.now() + tokenData.expires_in * 1000),
+                is_owner: isOwner
+            });
+
+            // Generate session token
+            const sessionToken = crypto.randomBytes(32).toString('hex');
+            const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+            
+            // Store session
+            sessions.set(sessionToken, {
+                userId: userData.id,
+                isOwner: isOwner,
+                expiresAt: expiresAt
+            });
+            
+            // Set session cookie
+            res.setHeader('Set-Cookie', `session=${sessionToken}; HttpOnly; Path=/; Max-Age=${24 * 60 * 60}`);
+            
+            // Redirect to appropriate page
+            if (isOwner) {
+                res.writeHead(302, { Location: '/owner.html' });
+            } else {
+                res.writeHead(302, { Location: '/index.html' });
+            }
+            res.end();
+        } catch (error) {
+            console.error('Auth error:', error);
+            res.writeHead(500);
+            res.end('Authentication failed');
         }
         return;
     }
