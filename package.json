@@ -1,13 +1,16 @@
 {
-  "name": "silentsignal-bot",
+  "name": "silent-signal-bot",
   "version": "1.0.0",
-  "description": "Discord DM Bot",
-  "main": "bot.js",
+  "description": "Discord bot for Silent Signal",
+  "main": "index.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.4.1"
+  },
+  "engines": {
+    "node": ">=16.9.0"
   }
 } 
