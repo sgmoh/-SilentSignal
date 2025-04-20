@@ -97,6 +97,47 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    // Handle bulk DM
+    if (req.url === '/api/owner/bulk-dm' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', async () => {
+            try {
+                const { userIds, message } = JSON.parse(body);
+                
+                if (!Array.isArray(userIds) || !message) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid request format' }));
+                    return;
+                }
+
+                const results = [];
+                for (const userId of userIds) {
+                    try {
+                        const user = await client.users.fetch(userId);
+                        if (user) {
+                            await user.send(message);
+                            results.push({ userId, status: 'success' });
+                        }
+                    } catch (error) {
+                        console.error(`Error sending DM to ${userId}:`, error);
+                        results.push({ userId, status: 'error', error: error.message });
+                    }
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ results }));
+            } catch (error) {
+                console.error('Error processing bulk DM:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to process bulk DM request' }));
+            }
+        });
+        return;
+    }
+
     // Serve static files
     let filePath = '.' + req.url;
     if (filePath === './') {

@@ -369,6 +369,44 @@
             border-radius: 50%;
             object-fit: cover;
         }
+
+        .results {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-item.success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+        
+        .result-item.error {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #F44336;
+        }
+        
+        .user-id {
+            font-family: monospace;
+        }
+        
+        .status {
+            font-weight: bold;
+        }
+        
+        .error {
+            color: #F44336;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -562,46 +600,68 @@
         }
 
         async function sendBulkDM() {
-            const message = document.getElementById('message').value.trim();
+            const message = document.getElementById('message').value;
             if (!message) {
-                document.getElementById('bulkResponse').textContent = 'Please enter a message';
+                alert('Please enter a message');
                 return;
             }
 
             if (selectedMembers.size === 0) {
-                document.getElementById('bulkResponse').textContent = 'Please select at least one member';
+                alert('Please select at least one member');
                 return;
             }
 
-            const status = document.getElementById('bulkResponse');
-            status.textContent = 'Sending messages...';
+            const sendButton = document.getElementById('sendButton');
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
 
             try {
                 const response = await fetch('/api/owner/bulk-dm', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         userIds: Array.from(selectedMembers),
                         message: message
-                    }),
+                    })
                 });
 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to send messages');
+                }
+
                 const data = await response.json();
-                status.textContent = data.response;
                 
+                // Show results
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+                
+                data.results.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = `result-item ${result.status}`;
+                    resultDiv.innerHTML = `
+                        <span class="user-id">${result.userId}</span>
+                        <span class="status">${result.status}</span>
+                        ${result.error ? `<span class="error">${result.error}</span>` : ''}
+                    `;
+                    resultsDiv.appendChild(resultDiv);
+                });
+
                 // Clear selection and message
                 selectedMembers.clear();
                 document.getElementById('message').value = '';
                 updateSelectedCount();
                 renderMembers();
                 
-                // Refresh stats and history
-                loadStats();
-                loadHistory();
+                alert('Messages sent successfully!');
             } catch (error) {
-                status.textContent = 'Error sending messages: ' + error.message;
+                console.error('Error sending messages:', error);
+                alert('Error sending messages: ' + error.message);
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send Messages';
             }
         }
 
