@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const supportBtn = document.getElementById('support-btn');
     const commandsBtn = document.getElementById('commands-btn');
     const useNowBtn = document.getElementById('use-now-btn');
+    const ownerBtn = document.getElementById('owner-btn');
     const modal = document.getElementById('commandsModal');
     const closeButton = document.querySelector('.close-button');
 
@@ -12,9 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const permissions = '8'; // Administrator permissions
     const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=${permissions}&scope=bot`;
     
-    // Generate OAuth2 authorization link with specific scopes
-    const oauthLink = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=https%3A%2F%2Fsilentsignal.onrender.com%2Fauth&response_type=code&scope=identify%20guilds.join%20bot&permissions=${permissions}`;
-
     // Set invite button href
     inviteBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -24,7 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Use Now button opens OAuth2 authorization
     useNowBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        window.open(oauthLink, '_blank');
+        window.location.href = '/api/auth/login?redirect=/commands.html';
+    });
+
+    // Owner button opens owner login page
+    ownerBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = '/owner-login.html';
     });
 
     supportBtn.addEventListener('click', (e) => {

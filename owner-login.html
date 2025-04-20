@@ -3,106 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silent Signal - Owner Login</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Owner Login</title>
     <style>
-        .login-container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            margin: 2rem auto;
-            max-width: 400px;
-        }
-
-        .login-form {
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
             display: flex;
-            flex-direction: column;
-            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .input-group label {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-
-        .input-group input {
-            padding: 12px;
-            border: none;
+        .login-box {
+            background: white;
+            padding: 20px;
             border-radius: 5px;
-            background: rgba(255, 255, 255, 0.9);
-            color: black;
-            font-size: 1rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 300px;
         }
-
-        .login-btn {
-            padding: 12px 24px;
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
             background: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: transform 0.3s ease;
-            margin-top: 1rem;
         }
-
-        .login-btn:hover {
-            transform: translateY(-3px);
+        button:hover {
+            background: #45a049;
         }
-
-        .error-message {
-            color: #f44336;
+        .error {
+            color: red;
             text-align: center;
-            margin-top: 1rem;
-        }
-
-        .back-link {
-            color: #4CAF50;
-            text-align: center;
-            margin-top: 1rem;
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="login-box">
         <h1>Owner Login</h1>
-        <div class="login-form">
-            <div class="input-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" placeholder="Enter username">
-            </div>
-            <div class="input-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" placeholder="Enter password">
-            </div>
-            <button class="login-btn" onclick="login()">Login</button>
-            <div id="errorMessage" class="error-message"></div>
-            <a href="/index.html" class="back-link">Back to Discord Login</a>
-        </div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <div id="error" class="error"></div>
     </div>
 
     <script>
         function login() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-
-            if (!username || !password) {
-                errorMessage.textContent = 'Please enter both username and password';
-                return;
-            }
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const error = document.getElementById('error');
 
             fetch('/api/owner/login', {
                 method: 'POST',
@@ -113,20 +76,17 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(data => {
-                        throw new Error(data.error || 'Login failed');
-                    });
+                    throw new Error('Invalid credentials');
                 }
                 return response.json();
             })
             .then(data => {
-                // Set session cookie
-                document.cookie = `session=${data.token}; Path=/; HttpOnly; SameSite=Strict`;
-                // Redirect to owner panel
-                window.location.href = '/owner.html';
+                if (data.success) {
+                    window.location.href = '/owner.html';
+                }
             })
             .catch(error => {
-                errorMessage.textContent = error.message;
+                document.getElementById('error').textContent = 'Invalid username or password';
             });
         }
 
