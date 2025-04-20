@@ -10,12 +10,13 @@ async function initializeDatabase() {
         // Drop existing table if it exists
         await pool.query('DROP TABLE IF EXISTS owner_credentials');
 
-        // Create simple owner credentials table
+        // Create owner credentials table with correct schema
         await pool.query(`
             CREATE TABLE owner_credentials (
                 id SERIAL PRIMARY KEY,
                 username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
