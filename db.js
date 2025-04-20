@@ -10,12 +10,9 @@ const pool = new Pool({
 // Initialize database
 async function initializeDatabase() {
     try {
-        // Drop existing table if it exists
-        await pool.query('DROP TABLE IF EXISTS owner_credentials');
-
-        // Create owner credentials table with correct schema
+        // Create owner credentials table if it doesn't exist
         await pool.query(`
-            CREATE TABLE owner_credentials (
+            CREATE TABLE IF NOT EXISTS owner_credentials (
                 id SERIAL PRIMARY KEY,
                 username TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
@@ -27,13 +24,24 @@ async function initializeDatabase() {
         const username = 'ghsman';
         const password = 'ghsman';
 
-        // Insert new credentials
-        await pool.query(`
-            INSERT INTO owner_credentials (username, password)
-            VALUES ($1, $2)
-        `, [username, password]);
+        // Check if credentials already exist
+        const existing = await pool.query(
+            'SELECT * FROM owner_credentials WHERE username = $1',
+            [username]
+        );
 
-        console.log('Database initialized with owner credentials');
+        // Only insert if credentials don't exist
+        if (existing.rows.length === 0) {
+            await pool.query(`
+                INSERT INTO owner_credentials (username, password)
+                VALUES ($1, $2)
+            `, [username, password]);
+            console.log('Owner credentials created');
+        } else {
+            console.log('Owner credentials already exist');
+        }
+
+        console.log('Database initialized');
     } catch (error) {
         console.error('Error initializing database:', error);
         throw error;
