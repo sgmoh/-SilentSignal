@@ -1,20 +1,16 @@
 services:
   - type: web
-    name: silent-signal
+    name: silentsignal
     env: node
     buildCommand: npm install
     startCommand: node index.js
     envVars:
       - key: DISCORD_TOKEN
         sync: false
-      - key: CLIENT_ID
+      - key: OWNER_USERNAME
         sync: false
-      - key: GUILD_ID
+      - key: OWNER_PASSWORD
         sync: false
-      - key: PORT
-        value: 10000
-      - key: DATABASE_URL
-        value: postgresql://SilentSignal_owner:npg_b0qYX6exAyHV@ep-fancy-night-a4q2m423-pooler.us-east-1.aws.neon.tech/SilentSignal?sslmode=require
-    healthCheckPath: /health
+    healthCheckPath: /
     autoDeploy: true
     staticPublishPath: ./ 

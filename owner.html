@@ -354,6 +354,21 @@
             border: 1px solid rgba(76, 175, 80, 0.2);
             padding: 1.5rem;
         }
+
+        .member-server {
+            color: #888;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .server-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -408,16 +423,35 @@
         let selectedMembers = new Set();
         let allMembers = [];
 
-        async function loadAllMembers() {
+        async function loadMembers() {
             try {
                 const response = await fetch('/api/owner/servers');
-                const data = await response.json();
+                if (!response.ok) throw new Error('Failed to load servers');
+                const servers = await response.json();
                 
+                // Clear existing members
                 allMembers = [];
-                for (const server of data.servers) {
-                    const membersResponse = await fetch(`/api/owner/servers/${server.id}/members`);
-                    const membersData = await membersResponse.json();
-                    allMembers = allMembers.concat(membersData.members);
+                
+                // Load members from each server
+                for (const server of servers) {
+                    try {
+                        const membersResponse = await fetch(`/api/owner/servers/${server.id}/members`);
+                        if (!membersResponse.ok) continue;
+                        
+                        const serverMembers = await membersResponse.json();
+                        // Add server name to each member and filter out bots
+                        const membersWithServer = serverMembers
+                            .filter(member => !member.bot) // Exclude bot accounts
+                            .map(member => ({
+                                ...member,
+                                serverName: server.name,
+                                serverIcon: server.icon
+                            }));
+                        allMembers.push(...membersWithServer);
+                    } catch (error) {
+                        console.error(`Error loading members from server ${server.name}:`, error);
+                        continue;
+                    }
                 }
                 
                 // Remove duplicates based on user ID
@@ -426,45 +460,46 @@
                 );
                 
                 renderMembers();
+                updateSelectedCount();
             } catch (error) {
                 console.error('Error loading members:', error);
+                alert('Failed to load members. Please try again.');
             }
         }
 
         function renderMembers() {
             const memberList = document.getElementById('memberList');
             memberList.innerHTML = '';
-
-            allMembers.forEach(member => {
-                const memberItem = document.createElement('div');
-                memberItem.className = 'member-item';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = selectedMembers.has(member.id);
-                checkbox.onchange = () => toggleMember(member.id);
-
-                const memberInfo = document.createElement('div');
-                memberInfo.className = 'member-info';
-                
-                const avatar = document.createElement('img');
-                avatar.className = 'member-avatar';
-                avatar.src = member.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-                avatar.alt = member.username;
-
-                const name = document.createElement('span');
-                name.className = 'member-name';
-                name.textContent = `${member.username}#${member.discriminator}`;
-
-                memberInfo.appendChild(avatar);
-                memberInfo.appendChild(name);
-                
-                memberItem.appendChild(checkbox);
-                memberItem.appendChild(memberInfo);
-                memberList.appendChild(memberItem);
+            
+            const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
+            const filteredMembers = allMembers.filter(member => 
+                member.username.toLowerCase().includes(searchTerm) ||
+                member.serverName.toLowerCase().includes(searchTerm)
+            );
+            
+            filteredMembers.forEach(member => {
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'member-item';
+                memberDiv.innerHTML = `
+                    <input type="checkbox" 
+                           id="member-${member.id}" 
+                           onchange="toggleMember('${member.id}')"
+                           ${selectedMembers.has(member.id) ? 'checked' : ''}>
+                    <label for="member-${member.id}">
+                        <img src="${member.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}" 
+                             alt="${member.username}" 
+                             class="member-avatar">
+                        <span class="member-name">${member.username}</span>
+                        <span class="member-server">
+                            <img src="${member.serverIcon || 'https://cdn.discordapp.com/embed/avatars/0.png'}" 
+                                 alt="${member.serverName}" 
+                                 class="server-icon">
+                            ${member.serverName}
+                        </span>
+                    </label>
+                `;
+                memberList.appendChild(memberDiv);
             });
-
-            updateSelectedCount();
         }
 
         function toggleMember(memberId) {
@@ -485,7 +520,7 @@
             const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
             const filteredMembers = allMembers.filter(member => 
                 member.username.toLowerCase().includes(searchTerm) ||
-                member.discriminator.includes(searchTerm)
+                member.serverName.toLowerCase().includes(searchTerm)
             );
             
             const memberList = document.getElementById('memberList');
@@ -512,8 +547,13 @@
                 name.className = 'member-name';
                 name.textContent = `${member.username}#${member.discriminator}`;
 
+                const serverName = document.createElement('span');
+                serverName.className = 'member-server';
+                serverName.textContent = member.serverName;
+
                 memberInfo.appendChild(avatar);
                 memberInfo.appendChild(name);
+                memberInfo.appendChild(serverName);
                 
                 memberItem.appendChild(checkbox);
                 memberItem.appendChild(memberInfo);
@@ -677,7 +717,7 @@
         }
 
         // Load initial data
-        loadAllMembers();
+        loadMembers();
         loadStats();
         loadHistory();
         loadBotReplies();
