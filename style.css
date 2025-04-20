@@ -14,9 +14,12 @@
 }
 
 body {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #ffffff;
+    min-height: 100vh;
 }
 
 .grid-background {
@@ -37,33 +40,67 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    text-align: center;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 3rem;
+.logo-container {
+    margin-bottom: 2rem;
 }
 
 .logo {
-    width: 200px;
+    width: 150px;
     height: auto;
     margin-bottom: 1rem;
-    border: 3px solid var(--primary-color);
-    border-radius: 15px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.logo:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 h1 {
-    font-size: 4rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: #4CAF50;
+    text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.description {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #cccccc;
+}
+
+.use-now-btn {
+    display: inline-block;
+    padding: 15px 30px;
+    background: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.use-now-btn:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+
+    .use-now-btn {
+        padding: 12px 24px;
+    }
 }
 
 .glow {
@@ -153,17 +190,6 @@ h1 {
 
 .feature-card p {
     color: var(--accent-color);
-}
-
-@media (max-width: 768px) {
-    .floating-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    h1 {
-        font-size: 3rem;
-    }
 }
 
 /* Modal Styles */
@@ -265,35 +291,6 @@ h1 {
 .command-permission {
     color: #ff4444;
     font-weight: bold;
-}
-
-.use-now-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 2rem;
-    background: var(--primary-color);
-    color: var(--secondary-color);
-    text-decoration: none;
-    border-radius: 50px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-top: 2rem;
-    transition: all 0.3s ease;
-    border: 2px solid var(--primary-color);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.use-now-btn i {
-    margin-left: 0.5rem;
-    transition: transform 0.3s ease;
-}
-
-.use-now-btn:hover {
-    background: transparent;
-    color: var(--primary-color);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .use-now-btn:hover i {

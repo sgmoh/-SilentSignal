@@ -1,15 +1,13 @@
 {
-  "name": "silent-signal-bot",
+  "name": "silent-signal",
   "version": "1.0.0",
-  "description": "Discord bot for Silent Signal",
+  "description": "Silent Signal Discord Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "discord.js": "^14.18.0",
-    "dotenv": "^16.5.0",
-    "pg": "^8.14.1"
+    "pg": "^8.11.3"
   },
   "engines": {
     "node": ">=16.9.0"
