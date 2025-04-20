@@ -10,38 +10,35 @@ const pool = new Pool({
 // Initialize database
 async function initializeDatabase() {
     try {
-        // Create owner credentials table if it doesn't exist
+        // Create owner_credentials table if it doesn't exist
         await pool.query(`
             CREATE TABLE IF NOT EXISTS owner_credentials (
-                id SERIAL PRIMARY KEY,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                username TEXT PRIMARY KEY,
+                password TEXT NOT NULL
             )
         `);
 
-        // Set up owner credentials
-        const username = 'ghsman';
-        const password = 'ghsman';
-
-        // Check if credentials already exist
+        // Check if credentials exist
         const existing = await pool.query(
             'SELECT * FROM owner_credentials WHERE username = $1',
-            [username]
+            [process.env.OWNER_USERNAME || 'ghsman']
         );
 
         // Only insert if credentials don't exist
         if (existing.rows.length === 0) {
-            await pool.query(`
-                INSERT INTO owner_credentials (username, password)
-                VALUES ($1, $2)
-            `, [username, password]);
-            console.log('Owner credentials created');
+            const username = process.env.OWNER_USERNAME || 'ghsman';
+            const password = process.env.OWNER_PASSWORD || 'ghsman';
+            
+            await pool.query(
+                'INSERT INTO owner_credentials (username, password) VALUES ($1, $2)',
+                [username, password]
+            );
+            console.log('Created owner credentials');
         } else {
             console.log('Owner credentials already exist');
         }
 
-        console.log('Database initialized');
+        console.log('Database initialized successfully');
     } catch (error) {
         console.error('Error initializing database:', error);
         throw error;
@@ -55,10 +52,10 @@ async function verifyOwnerCredentials(username, password) {
             'SELECT * FROM owner_credentials WHERE username = $1 AND password = $2',
             [username, password]
         );
-        return result.rows[0] || null;
+        return result.rows.length > 0;
     } catch (error) {
-        console.error('Error verifying credentials:', error);
-        return null;
+        console.error('Error verifying owner credentials:', error);
+        return false;
     }
 }
 
